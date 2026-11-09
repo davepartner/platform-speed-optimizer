@@ -17,8 +17,11 @@ bottlenecks, quantifies each one, and produces a **prioritized, measured plan** 
 millisecond savings — then implements the safe wins behind flags, with benchmarks and rollback.
 
 It is **platform- and language-agnostic**: it works for PHP/Laravel, Node/Next, Rails, Django, Go,
-Java, static sites, SPAs, mobile-web, and monoliths alike. Find the bottleneck by *measuring*, not by
-guessing a framework.
+Java, static sites, SPAs, and monoliths alike. Find the bottleneck by *measuring*, not by guessing a
+framework.
+
+**Scope:** web frontends + HTTP APIs + backend/data + infra/network (incl. serverless cold starts).
+Mobile *native* app performance (startup, jank, memory) needs a separate lens.
 
 > **Prime directive:** improve speed **without** changing API response shapes, breaking the UI/UX, or
 > introducing bugs. Every change is measured before and after, behind a flag, and reversible.
@@ -80,12 +83,24 @@ Scan ─▶ Measure ─▶ Diagnose ─▶ Estimate ─▶ Prioritize ─▶ Rep
 
 ## Estimating predicted improvements (honest)
 
-- Express savings as a **range** with a **confidence** (high/medium/low) and **basis** (bytes saved,
+- Express savings as a **range** with **confidence** (high/medium/low) and a **basis** (bytes saved,
   requests removed, cache hit-rate, p95 delta).
-- Use the calculator (`examples/estimate.mjs`): bytes → transfer ms at a realistic bandwidth, cache
-  expected latency, range with variance.
-- Prefer **field data (RUM/CrUX)** over lab (Lighthouse) for user impact; use lab for diagnosis.
-- Flag anything you cannot confidently estimate as "needs measurement."
+- Use the model in `examples/estimate.mjs`: RTT-aware transfer, **LCP/INP decomposition**, cache blend,
+  and `combineOverlapping` (**never sum gains on the same metric**).
+- Rank with `prioritize()` — `predictedMs × confidence × risk ÷ effort`.
+- Prefer **field data (RUM/CrUX)** over lab (Lighthouse) for impact; use lab for diagnosis.
+- Anything you can't estimate confidently → **"needs measurement,"** not a fake number.
+
+## Tools (executable & tested)
+
+- `examples/scan.mjs` — measure TTFB/total/bytes/headers for a list of URLs.
+- `examples/estimate.mjs` — the estimation model (RTT transfer, LCP/INP decomposition, ranges,
+  `combineOverlapping`, `prioritize`).
+- `examples/report.mjs` — render the ranked audit markdown from your findings.
+- `examples/queue.mjs` — reference job queue (backoff, DLQ, idempotency, health) for async/uploads.
+- `examples/contract.mjs` — snapshot/assert JSON response shapes (no API breakage).
+- `examples/lighthouserc.json` + `examples/k6-thresholds.js` — CI performance budgets.
+- `npm test` runs the suite; `node scripts/lint.mjs` checks docs + frontmatter.
 
 ## Standards this skill follows
 
@@ -101,15 +116,22 @@ Scan ─▶ Measure ─▶ Diagnose ─▶ Estimate ─▶ Prioritize ─▶ Rep
 ## References
 
 - `references/scan.md` — the Platform Map: what to inventory and how.
+- `references/measurement.md` — bootstrap measurement (even with no instrumentation) + tools.
 - `references/metrics.md` — metrics, thresholds, and the tools to get them.
-- `references/frontend.md` — page load, Core Web Vitals, images, fonts, JS/CSS, caching, CDN.
+- `references/frontend.md` — page load, Core Web Vitals, LCP/INP decomposition, images, JS/CSS, CDN.
 - `references/backend-api.md` — API latency, caching, payloads, pagination, compression, HTTP/2-3.
 - `references/database.md` — indexes, EXPLAIN, N+1, pooling, pagination.
 - `references/async-uploads.md` — queues vs cron, reliability, image/video uploads.
+- `references/job-queue.md` — the queue/DLQ/idempotency pattern (with `examples/queue.mjs`).
 - `references/navigation-forms.md` — avoid unnecessary reloads (progressive enhancement).
-- `references/frameworks.md` — when a framework swap is (and isn't) worth it.
+- `references/frameworks.md` — runtime config first; when a framework swap is (and isn't) worth it.
+- `references/infra-network.md` — server, network, CDN/HTTP, serverless cold starts.
+- `references/security-perf.md` — cache/compression/CDN security guardrails.
+- `references/contract-testing.md` — shape-snapshot contract tests (with `examples/contract.mjs`).
+- `references/rollout.md` — flags, canary, budgets, rollback, stop conditions.
 - `references/estimation.md` — how to predict ms honestly.
 - `references/safety.md` — the non-disruption + verification checklist.
 - `references/report-template.md` — the audit report format (the main deliverable).
 - `examples/audit-report.md` — a filled sample.
-- `examples/estimate.mjs` (+ test) — the estimation calculator. Run `npm install && npm test`.
+- `examples/report.mjs` — renders the ranked report (`renderReport`).
+- Run `npm install && npm test` (33 tests) and `node scripts/lint.mjs`.

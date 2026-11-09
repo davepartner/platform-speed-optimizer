@@ -42,3 +42,15 @@ Observability: no APM; server logs only.
 ```
 
 Keep it factual and short. This map drives every later step.
+
+## Scope note
+
+This skill targets **web frontends + HTTP APIs + backend/data**. Mobile *native* apps (startup time,
+jank, memory) need a separate lens. Serverless cold starts and infra/network are covered in
+`references/infra-network.md`.
+
+## Tooling
+
+- `examples/scan.mjs` — quick TTFB/total/bytes/headers scan for a list of URLs.
+- `references/measurement.md` — bootstrap measurement (curl, Server-Timing, Lighthouse, RUM, DB logs)
+  and the tools to go deeper.

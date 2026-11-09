@@ -2,6 +2,15 @@
 
 Targets: **LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1** (p75). TTFB is the floor of LCP — fix the server too.
 
+## The two decompositions (use these to *predict*)
+
+To predict page-load and responsiveness gains, decompose them (see `references/estimation.md`):
+
+- **LCP** = `TTFB` + `resource load delay` + `resource load time` + `render delay`.
+  Fix the biggest phase first; estimate each or mark "needs measurement."
+- **INP** = `input delay` + `processing` + `presentation`.
+  Usually dominated by main-thread JS; measure with a throttled DevTools run.
+
 ## LCP (loading)
 
 - **Server first:** reduce TTFB (caching, CDN, SSR/SSG). TTFB 800ms ⇒ LCP floor 800ms.

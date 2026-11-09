@@ -1,10 +1,11 @@
 {
   "name": "platform-speed-optimizer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
-  "description": "Reference estimation helpers for the platform-speed-optimizer skill.",
+  "description": "Reference tooling for the platform-speed-optimizer skill (scan, estimate, report, queue, contract).",
   "scripts": {
-    "test": "node --test examples/*.test.mjs"
+    "test": "node --test examples/*.test.mjs",
+    "lint": "node scripts/lint.mjs"
   }
 }

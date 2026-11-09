@@ -30,14 +30,16 @@ Paste the Platform Map from `references/scan.md`.
 
 ## 4. Bottleneck register (ranked)
 
-| ID | Area | Finding (evidence) | Fix | Predicted gain | Confidence | Effort | Risk |
-|----|------|--------------------|-----|----------------|------------|--------|------|
-| B1 | frontend | LCP image 1.2MB, lazy-loaded (evidence: waterfall) | AVIF + preload + fetchpriority | ≈0.8s (0.6–1.0s) | medium | S | low |
-| B2 | api | /api/search p95 1.4s, seq scan (EXPLAIN) | composite index + 60s cache | ≈1.2s (1.0–1.3s) | high | S | low |
-| B3 | async | image resize inline on upload (400–2000ms requests) | presigned upload + queue | ≈1.5s/request | high | M | med |
-| B4 | nav | filters do full reload | fetch + partial update (progressive) | ≈0.4s/interaction | medium | M | med |
+| ID | Area | Finding (evidence) | Fix | Metric | Predicted gain | Confidence | Effort | Risk | Verify |
+|----|------|--------------------|-----|--------|----------------|------------|--------|------|--------|
+| B1 | frontend | LCP image 1.2MB, lazy-loaded (waterfall) | AVIF + preload + fetchpriority | LCP | ≈0.8s (0.6–1.0s) | medium | S | low | field LCP p75 |
+| B2 | api | /api/search p95 1.4s, seq scan (EXPLAIN) | composite index + 60s cache | API p95 | ≈1.2s (1.0–1.3s) | high | S | low | k6 p95 |
+| B3 | async | image resize inline on upload | presigned upload + queue | request time | ≈1.5s/req | high | M | med | p95 upload |
+| B4 | nav | filters do full reload | fetch + partial update | INP | ≈0.4s/interaction | medium | M | med | field INP |
 
-Sort by predicted gain ÷ effort. Separate **safe quick wins** from **needs-care**.
+Sorted by the tested **priority score** (`predictedMs × confidence × risk ÷ effort`) via
+`examples/report.mjs`. Separate **safe quick wins** from **needs-care**. Add a `Metric` and a `Verify`
+command to every row, and **never sum overlapping gains** (`combineOverlapping`).
 
 ## 5. Detail per item
 

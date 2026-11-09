@@ -32,6 +32,18 @@ If the candidate doesn't clearly win on **measured** gain vs cost/risk → **don
 - **Feature-flag** the new routes, A/B, measure field metrics, roll back per-route.
 - Never "big-bang" a rewrite for speed.
 
+## Check runtime config *before* blaming the framework
+
+Many "slow framework" apps are really slow **runtime config**:
+
+- PHP: **opcache** + **JIT** enabled, realpath cache, no per-request bootstrap.
+- Node: **persistent workers**/cluster, no dev-mode overhead in prod, connection reuse.
+- Ruby: **Puma workers**, boot snapshot, eager load.
+- JVM: JIT warmup, container-aware heap, fast startup flags.
+- All: keep-alive to DB/upstreams, no debug/profiler in prod, warm caches after deploy.
+
+Fix the runtime first — it's usually a bigger, cheaper win than a rewrite.
+
 ## SDKs
 
 - **Load third-party SDKs lazily** and only where needed (not in `<head>` on every page).

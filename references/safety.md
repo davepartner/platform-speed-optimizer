@@ -3,6 +3,9 @@
 The promise: **faster, with no broken APIs, no new bugs, no UI/UX regressions, and old bugs fixed
 separately.**
 
+> **Companion docs:** `references/contract-testing.md` (shape tests), `references/rollout.md` (flags,
+> canary, budgets, rollback), `references/security-perf.md` (cache/compression guardrails).
+
 ## 1. Protect the API contract
 
 - **Never change existing response shapes** (keys, types, status codes, pagination, error envelope).
